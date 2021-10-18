@@ -90,11 +90,7 @@ def main() -> None:
 	# Process the indidividual MD files
 	for filename in glob.iglob(path_rawfiles+"/*.md"):
 		# Read current MD file
-		try:
-			metadata, content_md = read_record(filename)
-		except:
-			print("[X] Error reading file " + filename + ". Aborting.")
-			raise SystemExit
+		metadata, content_md = read_record(filename)
 		
 		# Generate HTML from MD file
 		page = generate_site(template, metadata, content_md)
