@@ -6,6 +6,7 @@ import markdown
 import os
 import re
 import shutil
+import sys
 import time
 import typing
 
@@ -14,7 +15,7 @@ def md_to_html(md: str) -> str:
 	try:
 		return markdown.markdown(md)
 	except:
-		print("[X] Error convertig markdown file to HTML. Aborting.")
+		print("[X] Error convertig markdown file to HTML. Aborting.", file=sys.stderr)
 		raise SystemExit
 
 
@@ -27,7 +28,7 @@ def make_output_folder(path: str) -> None:
 			shutil.rmtree(path)
 			os.mkdir(path)
 	except:
-		print("[X] Error making clean output folder. Aborting.")
+		print("[X] Error making clean output folder. Aborting.", file=sys.stderr)
 		raise SystemExit
 
 
@@ -37,7 +38,7 @@ def read_record(filepath: str) -> (dict, str):
 		with open(filepath) as f:
 			record = frontmatter.load(filepath)
 	except:
-		print("[X] Error loading input file >>>" + filepath + "<<<. Aborting.")
+		print("[X] Error loading input file >>>" + filepath + "<<<. Aborting.", file=sys.stderr)
 		raise SystemExit
 	
 	return (record.metadata, record.content)
@@ -48,7 +49,7 @@ def read_template(filepath: str) -> str:
 		with open(filepath, "r") as f:
 			template = f.read()
 	except:
-		print("[X] Error loading template file >>>" + filepath + "<<<. Aborting.")
+		print("[X] Error loading template file >>>" + filepath + "<<<. Aborting.", file=sys.stderr)
 		raise SystemExit
 	
 	assert len(template) > 0, "[X] Template file >>>" + filepath + "<<< has zero length. Aborting."
@@ -70,7 +71,7 @@ def generate_site(template: str, metadata: dict, content_md: str) -> str:
 		try:
 			page = page.replace(tag, metadata[tag[3:-2]])
 		except:
-			print ("[X] Could not find tag " + tag + " in metadata dictionary. Aborting.")
+			print ("[X] Could not find tag " + tag + " in metadata dictionary. Aborting.", file=sys.stderr)
 			raise SystemExit
 	
 	return page
@@ -90,7 +91,7 @@ def write_page(destination: str, page: str) -> None:
 		with open(destination, "w") as f:
 			f.write(page)
 	except:
-		print("[X] Error writing to file " + destination + ". Aborting.")
+		print("[X] Error writing to file " + destination + ". Aborting.", file=sys.stderr)
 		raise SystemExit
 
 
@@ -99,14 +100,15 @@ def main() -> None:
 	path_rawfiles = "./raw"
 	path_output = "./public_html/"
 	template_file = "./template.html"
+	verbose = False
 	
 	starttime_millisec = time.time()*1000
 	
 	# Make empty output folder and read template file
 	make_output_folder(path_output)
-	print("[*] Made output folder.")
+	if verbose: print("[*] Made output folder.")
 	template = read_template(template_file)
-	print("[*] Read template file.")
+	if verbose: print("[*] Read template file.")
 	
 	# Process the indidividual MD files
 	for filename in glob.iglob(path_rawfiles+"/*.md"):
@@ -120,7 +122,7 @@ def main() -> None:
 		destination = construct_destination_filename(filename, path_output)
 		write_page(destination, page)
 		
-		print("[*] Processed " + filename + " to " + destination + ".")
+		if verbose: print("[*] Processed " + filename + " to " + destination + ".")
 	
 	
 	endtime_millisec = time.time()*1000
