@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import configparser
 import frontmatter
 import glob
 import markdown
@@ -94,14 +95,42 @@ def write_page(destination: str, page: str) -> None:
 		print("[X] Error writing to file " + destination + ". Aborting.", file=sys.stderr)
 		raise SystemExit
 
-
-def main() -> None:
-	# Configuration
-	path_rawfiles = "./raw"
-	path_output = "./public_html/"
-	template_file = "./template.html"
-	verbose = False
+def load_config(config_file: str) -> (str, str, str, bool):
+	try:
+		config = configparser.ConfigParser()
+		config.read(config_file)
+	except:
+		print ("[X] Could not read configuration file " + config_file + ". Aborting.", file=sys.stderr)
+		raise SystemExit
 	
+	assert "CONFIG" in config.sections(), "No [CONFIG] section in configuration file " + config_file + ". Aborting."
+	
+	try:
+		path_rawfiles = config["CONFIG"]["path_rawfiles"]
+		path_output = config["CONFIG"]["path_output"]
+		template_file = config["CONFIG"]["template_file"]
+		verbose = config.getboolean("CONFIG", "verbose")
+	except:
+		print ("[X] Could not parse configuration file " + config_file + ". Please provide keys path_rawfiles, path_output, template_file, verbose. Aborting.", file=sys.stderr)
+		raise SystemExit
+	
+	assert len(path_rawfiles) > 0, "[X] path_rawfiles is of zero length in configuration file. Aborting."
+	assert len(path_output) > 0, "[X] path_output is of zero length in configuration file. Aborting."
+	assert len(template_file) > 0, "[X] template_file is of zero length in configuration file. Aborting."
+
+	return path_rawfiles, path_output, template_file, verbose
+	
+	
+def main() -> None:
+	config_file = "./tinySSG.ini"
+	path_rawfiles, path_output, template_file, verbose = load_config(config_file)
+	if verbose:
+		print ("[*] Loaded configuration file " + config_file + ".")
+		print ("\t[*] path_rawfiles: " + path_rawfiles)
+		print ("\t[*] path_output: " + path_output)
+		print ("\t[*] template_file: " + template_file)
+		print ("\t[*] tverbose: " + str(verbose))
+
 	starttime_millisec = time.time()*1000
 	
 	# Make empty output folder and read template file
