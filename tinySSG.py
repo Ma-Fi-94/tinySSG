@@ -65,7 +65,7 @@ def generate_site(template: str, metadata: dict, content_md: str) -> str:
 	page = page.replace("{{.content}}", content)
 	
 	# Now, we need to find and replace all tags
-	tags = re.findall("{{\..+?}}", page)
+	tags = re.findall(r"{{\..+?}}", page)
 	for tag in tags:
 		try:
 			page = page.replace(tag, metadata[tag[3:-2]])
@@ -79,6 +79,8 @@ def generate_site(template: str, metadata: dict, content_md: str) -> str:
 def construct_destination_filename(filename: str, path_output: str) -> str:
 		basename = os.path.basename(filename)
 		basename_wout_ext = os.path.splitext(basename)[0]
+		if path_output[-1] == "/":
+			path_output = path_output[:-1]
 		destination = path_output + "/" + basename_wout_ext + ".html"
 		return destination
 		
@@ -95,7 +97,7 @@ def write_page(destination: str, page: str) -> None:
 def main() -> None:
 	# Configuration
 	path_rawfiles = "./raw"
-	path_output = "./public_html"
+	path_output = "./public_html/"
 	template_file = "./template.html"
 	
 	starttime_millisec = time.time()*1000
