@@ -37,7 +37,7 @@ def read_record(filepath: str) -> (dict, str):
 		with open(filepath) as f:
 			record = frontmatter.load(filepath)
 	except:
-		print("[X] Error loading input file " + filepath + ". Aborting.")
+		print("[X] Error loading input file >>>" + filepath + "<<<. Aborting.")
 		raise SystemExit
 	
 	return (record.metadata, record.content)
@@ -50,6 +50,9 @@ def read_template(filepath: str) -> str:
 	except:
 		print("[X] Error loading template file >>>" + filepath + "<<<. Aborting.")
 		raise SystemExit
+	
+	assert len(template) > 0, "[X] Template file >>>" + filepath + "<<< has zero length. Aborting."
+	
 	return template
 
 
@@ -73,6 +76,22 @@ def generate_site(template: str, metadata: dict, content_md: str) -> str:
 	return page
 
 
+def construct_destination_filename(filename: str, path_output: str) -> str:
+		basename = os.path.basename(filename)
+		basename_wout_ext = os.path.splitext(basename)[0]
+		destination = path_output + "/" + basename_wout_ext + ".html"
+		return destination
+		
+
+def write_page(destination: str, page: str) -> None:
+	try:
+		with open(destination, "w") as f:
+			f.write(page)
+	except:
+		print("[X] Error writing to file " + destination + ". Aborting.")
+		raise SystemExit
+
+
 def main() -> None:
 	# Configuration
 	path_rawfiles = "./raw"
@@ -94,19 +113,10 @@ def main() -> None:
 		
 		# Generate HTML from MD file
 		page = generate_site(template, metadata, content_md)
-		
-		# Construct destination file name
-		basename_extension = os.path.basename(filename)
-		basename = os.path.splitext(basename_extension)[0]
-		destination = path_output + "/" + basename + ".html"
-		
+			
 		# Write HTML file to HDD
-		try:
-			with open(destination, "w") as f:
-				f.write(page)
-		except:
-			print("[X] Error writing to file " + destination + ". Aborting.")
-			raise SystemExit
+		destination = construct_destination_filename(filename, path_output)
+		write_page(destination, page)
 		
 		print("[*] Processed " + filename + " to " + destination + ".")
 	
