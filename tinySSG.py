@@ -13,14 +13,19 @@ import typing
 from typing import Tuple
 
 
+def abort(message: str) -> None:
+    print("[X] " + message, file=sys.stderr)
+    raise SystemExit
+
+
 def md_to_html(md: str) -> str:
     '''Convert a MD string to HTML'''
     try:
-        return markdown.markdown(md)
+        ret = markdown.markdown(md)
     except:
-        print("[X] Error convertig markdown file to HTML. Aborting.",
-              file=sys.stderr)
-        raise SystemExit
+        abort("Error convertig markdown file to HTML. Aborting.")
+
+    return ret
 
 
 def make_output_folder(path: str) -> None:
@@ -32,9 +37,7 @@ def make_output_folder(path: str) -> None:
             shutil.rmtree(path)
             os.mkdir(path)
     except:
-        print("[X] Error making clean output folder. Aborting.",
-              file=sys.stderr)
-        raise SystemExit
+        abort("Error making clean output folder. Aborting.")
 
 
 def read_record(filepath: str) -> Tuple[dict, str]:
@@ -43,9 +46,7 @@ def read_record(filepath: str) -> Tuple[dict, str]:
         with open(filepath) as f:
             record = frontmatter.load(filepath)
     except:
-        print("[X] Error loading input file >>>" + filepath + "<<<. Aborting.",
-              file=sys.stderr)
-        raise SystemExit
+        abort("Error loading input file >>>" + filepath + "<<<. Aborting.")
 
     return (record.metadata, record.content)
 
@@ -55,13 +56,10 @@ def read_file(filepath: str) -> str:
         with open(filepath, "r") as f:
             filecontents = f.read()
     except:
-        print("[X] Error loading file >>>" + filepath + "<<<. Aborting.",
-              file=sys.stderr)
-        raise SystemExit
+        abort("Error loading file >>>" + filepath + "<<<. Aborting.")
 
-    assert len(
-        filecontents
-    ) > 0, "[X] File >>>" + filepath + "<<< has zero length. Aborting."
+    if len(filecontents) == 0:
+        abort("File >>>" + filepath + "<<< has zero length. Aborting.")
 
     return filecontents
 
@@ -80,10 +78,8 @@ def generate_site(template: str, metadata: dict, content_md: str) -> str:
         try:
             page = page.replace(tag, metadata[tag[3:-2]])
         except:
-            print("[X] Could not find tag " + tag +
-                  " in metadata dictionary. Aborting.",
-                  file=sys.stderr)
-            raise SystemExit
+            abort(" Could not find tag " + tag +
+                  " in metadata dictionary. Aborting.")
 
     return page
 
@@ -102,9 +98,7 @@ def write_file(destination: str, contents: str) -> None:
         with open(destination, "w") as f:
             f.write(contents)
     except:
-        print("[X] Error writing to file " + destination + ". Aborting.",
-              file=sys.stderr)
-        raise SystemExit
+        abort("Error writing to file " + destination + ". Aborting.")
 
 
 def load_config(config_file: str) -> Tuple[str, str, str, bool]:
@@ -112,13 +106,12 @@ def load_config(config_file: str) -> Tuple[str, str, str, bool]:
         config = configparser.ConfigParser()
         config.read(config_file)
     except:
-        print("[X] Could not read configuration file " + config_file +
-              ". Aborting.",
-              file=sys.stderr)
-        raise SystemExit
+        abort("Could not read configuration file " + config_file +
+              ". Aborting.")
 
-    assert "CONFIG" in config.sections(
-    ), "No [CONFIG] section in configuration file " + config_file + ". Aborting."
+    if not "CONFIG" in config.sections():
+        abort("No [CONFIG] section in configuration file " + config_file +
+              ". Aborting.")
 
     try:
         path_rawfiles = config["CONFIG"]["path_rawfiles"]
@@ -126,21 +119,19 @@ def load_config(config_file: str) -> Tuple[str, str, str, bool]:
         template_file = config["CONFIG"]["template_file"]
         verbose = config.getboolean("CONFIG", "verbose")
     except:
-        print(
-            "[X] Could not parse configuration file " + config_file +
-            ". Please provide keys path_rawfiles, path_output, template_file, verbose. Aborting.",
-            file=sys.stderr)
-        raise SystemExit
+        abort(
+            "Could not parse configuration file " + config_file +
+            ". Please provide keys path_rawfiles, path_output, template_file, verbose. Aborting."
+        )
 
-    assert len(
-        path_rawfiles
-    ) > 0, "[X] path_rawfiles is of zero length in configuration file. Aborting."
-    assert len(
-        path_output
-    ) > 0, "[X] path_output is of zero length in configuration file. Aborting."
-    assert len(
-        template_file
-    ) > 0, "[X] template_file is of zero length in configuration file. Aborting."
+    if len(path_rawfiles) == 0:
+        abort(
+            "path_rawfiles is of zero length in configuration file. Aborting.")
+    if len(path_output) == 0:
+        abort("path_output is of zero length in configuration file. Aborting.")
+    if len(template_file) == 0:
+        abort(
+            "template_file is of zero length in configuration file. Aborting.")
 
     return path_rawfiles, path_output, template_file, verbose
 
