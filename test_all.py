@@ -4,8 +4,38 @@ from tinySSG import md_to_html
 from tinySSG import load_config
 from tinySSG import read_file
 from tinySSG import write_file
+from tinySSG import info
+from tinySSG import abort
 
+import io
 import mock
+import pytest
+import sys
+
+
+def test_info():
+    captured_output = io.StringIO()
+    sys.stdout = captured_output
+    info("abcdefg", verbose=True)
+    sys.stdout = sys.__stdout__
+    assert captured_output.getvalue() == "[*] abcdefg\n"
+
+    captured_output = io.StringIO()
+    sys.stdout = captured_output
+    info("abcdefg", verbose=False)
+    sys.stdout = sys.__stdout__
+    assert captured_output.getvalue() == ""
+
+
+def test_abort():
+    captured_output = io.StringIO()
+    sys.stderr = captured_output
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        abort("abcdefg")
+    sys.stderr = sys.__stderr__
+
+    assert pytest_wrapped_e.type == SystemExit
+    assert captured_output.getvalue() == "[X] abcdefg\n"
 
 
 def test_load_config():
