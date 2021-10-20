@@ -18,6 +18,11 @@ def abort(message: str) -> None:
     raise SystemExit
 
 
+def info(message: str, verbose: bool) -> None:
+    if verbose:
+        print("[*] " + message)
+
+
 def md_to_html(md: str) -> str:
     '''Convert a MD string to HTML'''
     try:
@@ -140,20 +145,19 @@ def main() -> None:
     config_file = "./tinySSG.ini"
     path_rawfiles, path_output, template_file, verbose = load_config(
         config_file)
-    if verbose:
-        print("[*] Loaded configuration file " + config_file + ".")
-        print("\t[*] path_rawfiles: " + path_rawfiles)
-        print("\t[*] path_output: " + path_output)
-        print("\t[*] template_file: " + template_file)
-        print("\t[*] tverbose: " + str(verbose))
+    info("Loaded configuration file " + config_file + ".", verbose)
+    info("\tpath_rawfiles: " + path_rawfiles, verbose)
+    info("\tpath_output: " + path_output, verbose)
+    info("\ttemplate_file: " + template_file, verbose)
+    info("\tverbose: " + str(verbose), verbose)
 
     starttime_millisec = time.time() * 1000
 
     # Make empty output folder and read template file
     make_output_folder(path_output)
-    if verbose: print("[*] Made output folder.")
+    info("Made output folder.", verbose)
     template = read_file(template_file)
-    if verbose: print("[*] Read template file.")
+    info("Read template file.", verbose)
 
     # Process the indidividual MD files
     for filename in glob.iglob(path_rawfiles + "/*.md"):
@@ -167,8 +171,7 @@ def main() -> None:
         destination = construct_destination_filename(filename, path_output)
         write_file(destination, page)
 
-        if verbose:
-            print("[*] Processed " + filename + " to " + destination + ".")
+        info("Processed " + filename + " to " + destination + ".", verbose)
 
     endtime_millisec = time.time() * 1000
     print("[*] Finished in " +
