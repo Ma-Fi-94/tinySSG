@@ -74,6 +74,8 @@ def generate_site(template: str, metadata: dict, content_md: str) -> str:
     page = template[:]
 
     # Convert page content from MD to HTML and add it to the template
+    if not "{{.content}}" in page:
+        abort("No {{.content}} tag found. Aborting.")
     content = md_to_html(content_md)
     page = page.replace("{{.content}}", content)
 
