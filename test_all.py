@@ -75,6 +75,11 @@ def test_load_config():
 
 
 def test_load_config_pathologiccases():
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        path_rawfiles, path_output, template_file, verbose = load_config(
+            "dummypath_doesnt_exist")
+        assert pytest_wrapped_e.type == SystemExit
+
     mock_configfile_content = '''
     [CONFIG]
     path_rawfiles = 
