@@ -46,7 +46,6 @@ def test_load_config():
     template_file = ./template.html
     verbose = true
     '''
-
     with mock.patch("builtins.open",
                     mock.mock_open(read_data=mock_configfile_content),
                     create=True) as mock_file:
@@ -57,6 +56,99 @@ def test_load_config():
     assert template_file == "./template.html"
     assert verbose == True
 
+    mock_configfile_content = '''
+    [CONFIG]
+    path_rawfiles = ./raw
+    path_output = ./public_html/
+    template_file = ./template.html
+    verbose = false
+    '''
+    with mock.patch("builtins.open",
+                    mock.mock_open(read_data=mock_configfile_content),
+                    create=True) as mock_file:
+        path_rawfiles, path_output, template_file, verbose = load_config(
+            "dummypath")
+    assert path_rawfiles == "./raw"
+    assert path_output == "./public_html/"
+    assert template_file == "./template.html"
+    assert verbose == False
+
+
+def test_load_config_pathologiccases():
+    mock_configfile_content = '''
+    [CONFIG]
+    path_rawfiles = 
+    path_output = ./public_html/
+    template_file = ./template.html
+    verbose = false
+    '''
+    with mock.patch("builtins.open",
+                    mock.mock_open(read_data=mock_configfile_content),
+                    create=True) as mock_file:
+        with pytest.raises(SystemExit) as pytest_wrapped_e:
+            path_rawfiles, path_output, template_file, verbose = load_config(
+                "dummypath")
+            assert pytest_wrapped_e.type == SystemExit
+
+    mock_configfile_content = '''
+    [CONFIG]
+    path_rawfiles = ./raw
+    path_output = 
+    template_file = ./template.html
+    verbose = false
+    '''
+    with mock.patch("builtins.open",
+                    mock.mock_open(read_data=mock_configfile_content),
+                    create=True) as mock_file:
+        with pytest.raises(SystemExit) as pytest_wrapped_e:
+            path_rawfiles, path_output, template_file, verbose = load_config(
+                "dummypath")
+            assert pytest_wrapped_e.type == SystemExit
+
+    mock_configfile_content = '''
+    [CONFIG]
+    path_rawfiles = ./raw
+    path_output = ./public_html/
+    template_file = 
+    verbose = false
+    '''
+    with mock.patch("builtins.open",
+                    mock.mock_open(read_data=mock_configfile_content),
+                    create=True) as mock_file:
+        with pytest.raises(SystemExit) as pytest_wrapped_e:
+            path_rawfiles, path_output, template_file, verbose = load_config(
+                "dummypath")
+            assert pytest_wrapped_e.type == SystemExit
+
+    mock_configfile_content = '''
+    [CONFIG]
+    path_rawfiles = ./raw
+    path_output = ./public_html/
+    template_file = ./template.html
+    verbose =
+    '''
+    with mock.patch("builtins.open",
+                    mock.mock_open(read_data=mock_configfile_content),
+                    create=True) as mock_file:
+        with pytest.raises(SystemExit) as pytest_wrapped_e:
+            path_rawfiles, path_output, template_file, verbose = load_config(
+                "dummypath")
+            assert pytest_wrapped_e.type == SystemExit
+
+    mock_configfile_content = '''
+    path_rawfiles = ./raw
+    path_output = ./public_html/
+    template_file = ./template.html
+    verbose = abcde
+    '''
+    with mock.patch("builtins.open",
+                    mock.mock_open(read_data=mock_configfile_content),
+                    create=True) as mock_file:
+        with pytest.raises(SystemExit) as pytest_wrapped_e:
+            path_rawfiles, path_output, template_file, verbose = load_config(
+                "dummypath")
+            assert pytest_wrapped_e.type == SystemExit
+
 
 def test_read_file():
     mock_filecontents = "MOCKEDMOCKEDMOCKED\nMOCKEDMOCKEDMOCKEDMOCKED"
@@ -65,6 +157,11 @@ def test_read_file():
                     create=True) as mock_file:
         readfilecontents = read_file("dummypath")
     assert mock_filecontents == readfilecontents
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        path_rawfiles, path_output, template_file, verbose = load_config(
+            "dummypath")
+        assert pytest_wrapped_e.type == SystemExit
 
 
 def test_write_file():
@@ -90,6 +187,18 @@ def test_generate_site():
                          metadata = {"var1": "variable1text"},
                          content_md="contentcontent") == \
             "variable1text <p>contentcontent</p>"
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        generate_site(template="{{.var1}} {{.content}}",
+                      metadata={},
+                      content_md="contentcontent")
+        assert pytest_wrapped_e == SystemExit
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        generate_site(template="{{.var1}}",
+                      metadata={"var1": "variable1text"},
+                      content_md="contentcontent")
+        assert pytest_wrapped_e == SystemExit
 
 
 def test_md_to_html():
