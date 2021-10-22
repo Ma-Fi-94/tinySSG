@@ -82,11 +82,6 @@ def test_load_config():
 
 
 def test_load_config_emptyline():
-    with pytest.raises(SystemExit) as pytest_wrapped_e:
-        path_rawfiles, path_output, template_file, verbose = load_config(
-            "dummypath_doesnt_exist")
-        assert pytest_wrapped_e.type == SystemExit
-
     mock_configfile_content = '''
     [CONFIG]
     path_rawfiles = 
@@ -100,7 +95,7 @@ def test_load_config_emptyline():
         with pytest.raises(SystemExit) as pytest_wrapped_e:
             path_rawfiles, path_output, template_file, verbose = load_config(
                 "dummypath")
-            assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.type == SystemExit
 
     mock_configfile_content = '''
     [CONFIG]
@@ -115,7 +110,7 @@ def test_load_config_emptyline():
         with pytest.raises(SystemExit) as pytest_wrapped_e:
             path_rawfiles, path_output, template_file, verbose = load_config(
                 "dummypath")
-            assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.type == SystemExit
 
     mock_configfile_content = '''
     [CONFIG]
@@ -130,7 +125,7 @@ def test_load_config_emptyline():
         with pytest.raises(SystemExit) as pytest_wrapped_e:
             path_rawfiles, path_output, template_file, verbose = load_config(
                 "dummypath")
-            assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.type == SystemExit
 
     mock_configfile_content = '''
     [CONFIG]
@@ -145,7 +140,7 @@ def test_load_config_emptyline():
         with pytest.raises(SystemExit) as pytest_wrapped_e:
             path_rawfiles, path_output, template_file, verbose = load_config(
                 "dummypath")
-            assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.type == SystemExit
 
 
 def test_load_config_nonsense():
@@ -161,7 +156,7 @@ def test_load_config_nonsense():
         with pytest.raises(SystemExit) as pytest_wrapped_e:
             path_rawfiles, path_output, template_file, verbose = load_config(
                 "dummypath")
-            assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.type == SystemExit
 
 
 def test_load_config_missinglines():
@@ -176,7 +171,7 @@ def test_load_config_missinglines():
         with pytest.raises(SystemExit) as pytest_wrapped_e:
             path_rawfiles, path_output, template_file, verbose = load_config(
                 "dummypath")
-            assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.type == SystemExit
 
     mock_configfile_content = '''
     path_rawfiles = ./raw
@@ -189,7 +184,7 @@ def test_load_config_missinglines():
         with pytest.raises(SystemExit) as pytest_wrapped_e:
             path_rawfiles, path_output, template_file, verbose = load_config(
                 "dummypath")
-            assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.type == SystemExit
 
     mock_configfile_content = '''
     path_rawfiles = ./raw
@@ -202,7 +197,7 @@ def test_load_config_missinglines():
         with pytest.raises(SystemExit) as pytest_wrapped_e:
             path_rawfiles, path_output, template_file, verbose = load_config(
                 "dummypath")
-            assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.type == SystemExit
 
     mock_configfile_content = '''
     path_rawfiles = ./raw
@@ -215,7 +210,7 @@ def test_load_config_missinglines():
         with pytest.raises(SystemExit) as pytest_wrapped_e:
             path_rawfiles, path_output, template_file, verbose = load_config(
                 "dummypath")
-            assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.type == SystemExit
 
 
 def test_read_file():
@@ -231,7 +226,7 @@ def test_read_file_nonexisting_file():
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         path_rawfiles, path_output, template_file, verbose = load_config(
             "dummypath")
-        assert pytest_wrapped_e.type == SystemExit
+    assert pytest_wrapped_e.type == SystemExit
 
 
 def test_write_file():
@@ -250,7 +245,7 @@ def test_write_file_IOError():
             mocked_open.side_effect = IOError()
             write_file("dummypath", "content")
 
-        assert pytest_wrapped_e.type == SystemExit
+    assert pytest_wrapped_e.type == SystemExit
 
 
 def test_construct_destination_filename():
@@ -274,7 +269,7 @@ def test_generate_site_missing_metadata():
         generate_site(template="{{.var1}} {{.content}}",
                       metadata={},
                       content_md="contentcontent")
-        assert pytest_wrapped_e == SystemExit
+    assert pytest_wrapped_e.type == SystemExit
 
 
 def test_generate_site_no_content_tag():
@@ -282,7 +277,7 @@ def test_generate_site_no_content_tag():
         generate_site(template="{{.var1}}",
                       metadata={"var1": "variable1text"},
                       content_md="contentcontent")
-        assert pytest_wrapped_e == SystemExit
+    assert pytest_wrapped_e.type == SystemExit
 
 
 def test_md_to_html():
@@ -293,4 +288,4 @@ def test_md_to_html():
 def test_md_to_html_invalid_markdown():
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         md_to_html(12345)
-        assert pytest_wrapped_e.type == SystemExit
+    assert pytest_wrapped_e.type == SystemExit
