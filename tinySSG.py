@@ -48,12 +48,11 @@ def make_output_folder(path: str) -> None:
 def read_record(filepath: str) -> Tuple[dict, str]:
     '''Extract header and contents from a page record'''
     try:
-        with open(filepath) as f:
-            record = frontmatter.load(filepath)
+        record_text = read_file(filepath)
+        record = frontmatter.loads(record_text)
     except:
         abort("Error loading input file >>>" + filepath + "<<<. Aborting.")
-
-    return (record.metadata, record.content)
+    return record.metadata, record.content
 
 
 def read_file(filepath: str) -> str:
@@ -62,10 +61,8 @@ def read_file(filepath: str) -> str:
             filecontents = f.read()
     except:
         abort("Error loading file >>>" + filepath + "<<<. Aborting.")
-
     if len(filecontents) == 0:
         abort("File >>>" + filepath + "<<< has zero length. Aborting.")
-
     return filecontents
 
 
@@ -165,6 +162,8 @@ def main() -> None:
     for filename in glob.iglob(path_rawfiles + "/*.md"):
         # Read current MD file
         metadata, content_md = read_record(filename)
+        print(metadata)
+        print(content_md)
 
         # Generate HTML from MD file
         page = generate_site(template, metadata, content_md)
