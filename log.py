@@ -1,3 +1,5 @@
+import sys
+
 class Logger:
     '''A very simple logger which logs to screen based on verbosity.'''
     
@@ -11,5 +13,5 @@ class Logger:
     def info(self, msg: str) -> None:
         print("[*] " + msg)
     
-    def critical(self, msg: str) -> None:
-        print("[X] " + msg)
+    #def critical(self, msg: str) -> None:
+    #    print("[X] " + msg, file=sys.stderr)

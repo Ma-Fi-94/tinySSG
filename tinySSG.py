@@ -12,15 +12,12 @@ import time
 import typing
 from typing import Tuple
 
+import log
+
 
 def abort(message: str) -> None:
     print("[X] " + message, file=sys.stderr)
     raise SystemExit
-
-
-def info(message: str, verbose: bool) -> None:
-    if verbose:
-        print("[*] " + message)
 
 
 def md_to_html(md: str) -> str:
@@ -144,26 +141,26 @@ def main() -> None:
     config_file = "./tinySSG.ini"
     path_rawfiles, path_output, template_file, verbose = load_config(
         config_file)
-    info("Loaded configuration file " + config_file + ".", verbose)
-    info("\tpath_rawfiles: " + path_rawfiles, verbose)
-    info("\tpath_output: " + path_output, verbose)
-    info("\ttemplate_file: " + template_file, verbose)
-    info("\tverbose: " + str(verbose), verbose)
+
+    logger = log.Logger(verbose=verbose)
+    logger.info_verbose("Loaded configuration file " + config_file + ".")
+    logger.info_verbose("\tpath_rawfiles: " + path_rawfiles)
+    logger.info_verbose("\tpath_output: " + path_output)
+    logger.info_verbose("\ttemplate_file: " + template_file)
+    logger.info_verbose("\tverbose: " + str(verbose))
 
     starttime_millisec = time.time() * 1000
 
     # Make empty output folder and read template file
     make_output_folder(path_output)
-    info("Made output folder.", verbose)
+    logger.info_verbose("Made output folder " + path_output + ".")
     template = read_file(template_file)
-    info("Read template file.", verbose)
+    logger.info_verbose("Read template file " + template_file + ".")
 
     # Process the indidividual MD files
     for filename in glob.iglob(path_rawfiles + "/*.md"):
         # Read current MD file
         metadata, content_md = read_record(filename)
-        print(metadata)
-        print(content_md)
 
         # Generate HTML from MD file
         page = generate_site(template, metadata, content_md)
@@ -172,11 +169,11 @@ def main() -> None:
         destination = construct_destination_filename(filename, path_output)
         write_file(destination, page)
 
-        info("Processed " + filename + " to " + destination + ".", verbose)
+        #info("Processed " + filename + " to " + destination + ".", verbose)
 
     endtime_millisec = time.time() * 1000
-    print("[*] Finished in " +
-          str(round(endtime_millisec - starttime_millisec, 2)) + " ms.")
+    logger.info("Finished in " +
+                str(round(endtime_millisec - starttime_millisec, 2)) + " ms.")
 
 
 if __name__ == "__main__":

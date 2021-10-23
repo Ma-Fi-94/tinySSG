@@ -4,9 +4,10 @@ from tinySSG import md_to_html
 from tinySSG import load_config
 from tinySSG import read_file
 from tinySSG import write_file
-from tinySSG import info
 from tinySSG import abort
 from tinySSG import read_record
+
+import log
 
 import io
 import mock
@@ -20,18 +21,36 @@ def test_read_record_missing_file():
     assert pytest_wrapped_e.type == SystemExit
 
 
-def test_info():
+def test_logger_info_verbose():
+    logger = log.Logger(verbose=True)
     captured_output = io.StringIO()
     sys.stdout = captured_output
-    info("abcdefg", verbose=True)
+    logger.info_verbose("abcdefg")
     sys.stdout = sys.__stdout__
     assert captured_output.getvalue() == "[*] abcdefg\n"
 
+    logger = log.Logger(verbose=False)
     captured_output = io.StringIO()
     sys.stdout = captured_output
-    info("abcdefg", verbose=False)
+    logger.info_verbose("abcdefg")
     sys.stdout = sys.__stdout__
     assert captured_output.getvalue() == ""
+
+
+def test_logger_info():
+    logger = log.Logger(verbose=True)
+    captured_output = io.StringIO()
+    sys.stdout = captured_output
+    logger.info("abcdefg")
+    sys.stdout = sys.__stdout__
+    assert captured_output.getvalue() == "[*] abcdefg\n"
+
+    logger = log.Logger(verbose=False)
+    captured_output = io.StringIO()
+    sys.stdout = captured_output
+    logger.info("abcdefg")
+    sys.stdout = sys.__stdout__
+    assert captured_output.getvalue() == "[*] abcdefg\n"
 
 
 def test_abort():
