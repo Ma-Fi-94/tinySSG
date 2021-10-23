@@ -14,9 +14,11 @@ from typing import Tuple
 
 import log
 
+logger = log.Logger()
+
 
 def abort(message: str) -> None:
-    print("[X] " + message, file=sys.stderr)
+    logger.critical(message)
     raise SystemExit
 
 
@@ -142,7 +144,7 @@ def main() -> None:
     path_rawfiles, path_output, template_file, verbose = load_config(
         config_file)
 
-    logger = log.Logger(verbose=verbose)
+    logger.set_verbose(verbose)
     logger.info_verbose("Loaded configuration file " + config_file + ".")
     logger.info_verbose("\tpath_rawfiles: " + path_rawfiles)
     logger.info_verbose("\tpath_output: " + path_output)
