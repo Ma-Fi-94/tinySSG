@@ -139,6 +139,23 @@ def load_config(config_file: str) -> Tuple[str, str, str, bool]:
     return path_rawfiles, path_output, template_file, verbose
 
 
+def process_input_files(path_rawfiles: str, template: str,
+                        path_output: str) -> None:
+    for filename in glob.iglob(path_rawfiles + "/*.md"):
+        # Read current MD file
+        metadata, content_md = read_record(filename)
+
+        # Generate HTML from MD file
+        page = generate_site(template, metadata, content_md)
+
+        # Write HTML file to HDD
+        destination = construct_destination_filename(filename, path_output)
+        write_file(destination, page)
+
+        logger.info_verbose("Processed " + filename + " to " + destination +
+                            ".")
+
+
 def main() -> None:
     config_file = "./tinySSG.ini"
     path_rawfiles, path_output, template_file, verbose = load_config(
@@ -153,25 +170,13 @@ def main() -> None:
 
     starttime_millisec = time.time() * 1000
 
-    # Make empty output folder and read template file
     make_output_folder(path_output)
     logger.info_verbose("Made output folder " + path_output + ".")
+
     template = read_file(template_file)
     logger.info_verbose("Read template file " + template_file + ".")
 
-    # Process the indidividual MD files
-    for filename in glob.iglob(path_rawfiles + "/*.md"):
-        # Read current MD file
-        metadata, content_md = read_record(filename)
-
-        # Generate HTML from MD file
-        page = generate_site(template, metadata, content_md)
-
-        # Write HTML file to HDD
-        destination = construct_destination_filename(filename, path_output)
-        write_file(destination, page)
-
-        #info("Processed " + filename + " to " + destination + ".", verbose)
+    process_input_files(path_rawfiles, template, path_output)
 
     endtime_millisec = time.time() * 1000
     logger.info("Finished in " +
