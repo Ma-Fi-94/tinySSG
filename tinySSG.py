@@ -44,13 +44,11 @@ def make_output_folder(path: str) -> None:
         abort("Error making clean output folder. Aborting.")
 
 
-def read_record(filepath: str) -> Tuple[dict, str]:
-    '''Extract header and contents from a page record'''
+def parse_record(record_text: str) -> Tuple[dict, str]:
     try:
-        record_text = read_file(filepath)
         record = frontmatter.loads(record_text)
     except:
-        abort("Error loading input file >>>" + filepath + "<<<. Aborting.")
+        abort("Error parsing record. Aborting.")
     return record.metadata, record.content
 
 
@@ -143,7 +141,7 @@ def process_input_files(path_rawfiles: str, template: str,
                         path_output: str) -> None:
     for filename in glob.iglob(path_rawfiles + "/*.md"):
         # Read current MD file
-        metadata, content_md = read_record(filename)
+        metadata, content_md = parse_record(read_file(filename))
 
         # Generate HTML from MD file
         page = generate_site(template, metadata, content_md)
@@ -177,6 +175,7 @@ def main() -> None:
     logger.info_verbose("Read template file " + template_file + ".")
 
     process_input_files(path_rawfiles, template, path_output)
+    logger.info_verbose("Processed all input files.")
 
     endtime_millisec = time.time() * 1000
     logger.info("Finished in " +

@@ -5,7 +5,7 @@ from tinySSG import load_config
 from tinySSG import read_file
 from tinySSG import write_file
 from tinySSG import abort
-from tinySSG import read_record
+from tinySSG import parse_record
 
 import io
 import mock
@@ -13,11 +13,19 @@ import pytest
 import sys
 
 
+# This fails, weirdly enough. It returns the complete
+# mock_record as content, and an empty metadata dict...
+# TODO investigate this with a minimal working (failing) example
+#def test_parse_record():
+#    mock_record = '''---
+#    var1: var1content
+#    ---
+#    Page content page content ...
+#    '''
 
-def test_read_record_missing_file():
-    with pytest.raises(SystemExit) as pytest_wrapped_e:
-        read_record("thispathdoesnotexist")
-    assert pytest_wrapped_e.type == SystemExit
+#    metadata, content = parse_record(mock_record)
+#    assert metadata == {'var1': 'var1content'}
+#    assert content == "Page content page content ...\n"
 
 
 def test_abort():
