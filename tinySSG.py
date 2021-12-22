@@ -46,8 +46,17 @@ def read_file(filepath: str) -> str:
     return filecontents
 
 
+def write_file(destination: str, contents: str) -> None:
+    '''Generic file writing function'''
+    try:
+        with open(destination, "w") as f:
+            f.write(contents)
+    except:
+        abort("Error writing to file " + destination + ". Aborting.")
+
+
 def generate_site(template: str, content: str) -> str:
-    '''Compose the HTML file from the template HTML, the metadata dict, and the content in MD format.'''
+    '''Compose the HTML file from the template and the input HTML'''
     page = template[:]
 
     # Convert page content from MD to HTML and add it to the template
@@ -65,15 +74,6 @@ def construct_destination_filename(filename: str, path_output: str) -> str:
         path_output = path_output[:-1]
     destination = path_output + "/" + basename_wout_ext + ".html"
     return destination
-
-
-def write_file(destination: str, contents: str) -> None:
-    '''Generic file writing function'''
-    try:
-        with open(destination, "w") as f:
-            f.write(contents)
-    except:
-        abort("Error writing to file " + destination + ". Aborting.")
 
 
 def load_config(config_file: str) -> Tuple[str, str, str, bool]:
@@ -128,7 +128,7 @@ def process_input_files(path_rawfiles: str, template: str,
                             ".")
 
 
-def main() -> None:
+def main() -> None:  # pragma: no cover
     config_file = "./tinySSG.ini"
     path_rawfiles, path_output, template_file, verbose = load_config(
         config_file)
@@ -156,5 +156,5 @@ def main() -> None:
                 str(round(endtime_millisec - starttime_millisec, 2)) + " ms.")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()
