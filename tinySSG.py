@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import configparser
-import frontmatter  # type: ignore
 import glob
 import markdown
 import os
@@ -9,6 +8,7 @@ import re
 import shutil
 import sys
 import time
+
 import typing
 from typing import Tuple
 
@@ -20,16 +20,6 @@ logger = log.Logger()
 def abort(message: str) -> None:
     logger.critical(message)
     raise SystemExit
-
-
-def md_to_html(md: str) -> str:
-    '''Convert a MD string to HTML'''
-    try:
-        ret = markdown.markdown(md)
-    except:
-        abort("Error convertig markdown file to HTML. Aborting.")
-
-    return ret
 
 
 def make_output_folder(path: str) -> None:
@@ -44,15 +34,8 @@ def make_output_folder(path: str) -> None:
         abort("Error making clean output folder. Aborting.")
 
 
-def parse_record(record_text: str) -> Tuple[dict, str]:
-    try:
-        record = frontmatter.loads(record_text)
-    except:
-        abort("Error parsing record. Aborting.")
-    return record.metadata, record.content
-
-
 def read_file(filepath: str) -> str:
+    '''Generic file reading function'''
     try:
         with open(filepath, "r") as f:
             filecontents = f.read()
@@ -63,24 +46,14 @@ def read_file(filepath: str) -> str:
     return filecontents
 
 
-def generate_site(template: str, metadata: dict, content_md: str) -> str:
+def generate_site(template: str, content: str) -> str:
     '''Compose the HTML file from the template HTML, the metadata dict, and the content in MD format.'''
     page = template[:]
 
     # Convert page content from MD to HTML and add it to the template
     if not "{{.content}}" in page:
         abort("No {{.content}} tag found. Aborting.")
-    content = md_to_html(content_md)
     page = page.replace("{{.content}}", content)
-
-    # Now, we need to find and replace all tags
-    tags = re.findall(r"{{\..+?}}", page)
-    for tag in tags:
-        try:
-            page = page.replace(tag, metadata[tag[3:-2]])
-        except:
-            abort(" Could not find tag " + tag +
-                  " in metadata dictionary. Aborting.")
 
     return page
 
@@ -95,6 +68,7 @@ def construct_destination_filename(filename: str, path_output: str) -> str:
 
 
 def write_file(destination: str, contents: str) -> None:
+    '''Generic file writing function'''
     try:
         with open(destination, "w") as f:
             f.write(contents)
@@ -139,12 +113,12 @@ def load_config(config_file: str) -> Tuple[str, str, str, bool]:
 
 def process_input_files(path_rawfiles: str, template: str,
                         path_output: str) -> None:
-    for filename in glob.iglob(path_rawfiles + "/*.md"):
-        # Read current MD file
-        metadata, content_md = parse_record(read_file(filename))
+    for filename in glob.iglob(path_rawfiles + "/*.html"):
+        # Read current HTML file
+        content = read_file(filename)
 
         # Generate HTML from MD file
-        page = generate_site(template, metadata, content_md)
+        page = generate_site(template, content)
 
         # Write HTML file to HDD
         destination = construct_destination_filename(filename, path_output)

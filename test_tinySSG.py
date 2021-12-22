@@ -1,31 +1,14 @@
 from tinySSG import construct_destination_filename
 from tinySSG import generate_site
-from tinySSG import md_to_html
 from tinySSG import load_config
 from tinySSG import read_file
 from tinySSG import write_file
 from tinySSG import abort
-from tinySSG import parse_record
 
 import io
 import mock
 import pytest
 import sys
-
-
-# This fails, weirdly enough. It returns the complete
-# mock_record as content, and an empty metadata dict...
-# TODO investigate this with a minimal working (failing) example
-#def test_parse_record():
-#    mock_record = '''---
-#    var1: var1content
-#    ---
-#    Page content page content ...
-#    '''
-
-#    metadata, content = parse_record(mock_record)
-#    assert metadata == {'var1': 'var1content'}
-#    assert content == "Page content page content ...\n"
 
 
 def test_abort():
@@ -247,34 +230,4 @@ def test_construct_destination_filename():
 
 
 def test_generate_site():
-    assert generate_site(template = "{{.var1}} {{.content}}",
-                         metadata = {"var1": "variable1text"},
-                         content_md="contentcontent") == \
-            "variable1text <p>contentcontent</p>"
-
-
-def test_generate_site_missing_metadata():
-    with pytest.raises(SystemExit) as pytest_wrapped_e:
-        generate_site(template="{{.var1}} {{.content}}",
-                      metadata={},
-                      content_md="contentcontent")
-    assert pytest_wrapped_e.type == SystemExit
-
-
-def test_generate_site_no_content_tag():
-    with pytest.raises(SystemExit) as pytest_wrapped_e:
-        generate_site(template="{{.var1}}",
-                      metadata={"var1": "variable1text"},
-                      content_md="contentcontent")
-    assert pytest_wrapped_e.type == SystemExit
-
-
-def test_md_to_html():
-    assert md_to_html("#heading") == "<h1>heading</h1>"
-    assert md_to_html("# heading") == "<h1>heading</h1>"
-
-
-def test_md_to_html_invalid_markdown():
-    with pytest.raises(SystemExit) as pytest_wrapped_e:
-        md_to_html(12345)
-    assert pytest_wrapped_e.type == SystemExit
+    pass  #TBD!

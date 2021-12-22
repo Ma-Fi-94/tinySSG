@@ -50,6 +50,3 @@ def test_logger_info():
     logger = log.Logger(verbose=False, infostream=captured_output)
     logger.info("abcdefg")
     assert captured_output.getvalue() == "[*] abcdefg\n"
-
-
-
