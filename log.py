@@ -1,7 +1,7 @@
 import sys
 
 class Logger:
-    '''A very simple logger which logs to screen based on verbosity.'''
+    '''A very simple logger which logs to arbitrary streams based on a verbosity setting provided.'''
     
     def __init__(self, verbose=True, infostream=sys.stdout, criticalstream=sys.stderr) -> None:
         self.verbose = verbose
