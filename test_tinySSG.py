@@ -5,10 +5,8 @@ from tinySSG import read_file
 from tinySSG import write_file
 from tinySSG import abort
 
-import io
 import mock
 import pytest
-import sys
 
 
 def test_abort():
@@ -222,10 +220,10 @@ def test_write_file_IOError():
 
 def test_construct_destination_filename():
     assert construct_destination_filename(
-        filename="filename.md", path_output="path/to/outputfolder"
+        filename="filename.html", path_output="path/to/outputfolder"
     ) == "path/to/outputfolder/filename.html"
     assert construct_destination_filename(
-        filename="filename.md", path_output="path/to/outputfolder/"
+        filename="filename.html", path_output="path/to/outputfolder/"
     ) == "path/to/outputfolder/filename.html"
 
 

@@ -1,3 +1,6 @@
+importchecker tinySSG.py
+importchecker test_log.py
+importchecker test_tinySSG.py
 yapf -i tinySSG.py
 yapf -i test_log.py
 yapf -i test_tinySSG.py

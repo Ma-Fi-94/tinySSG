@@ -1,8 +1,5 @@
 import log
-
 import io
-import pytest
-import sys
 
 
 def test_logger_get_set_verbose():

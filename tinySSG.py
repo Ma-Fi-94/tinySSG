@@ -2,16 +2,10 @@
 
 import configparser
 import glob
-import markdown
 import os
-import re
 import shutil
-import sys
 import time
-
-import typing
 from typing import Tuple
-
 import log
 
 logger = log.Logger()
@@ -56,23 +50,21 @@ def write_file(destination: str, contents: str) -> None:
 
 
 def generate_site(template: str, content: str) -> str:
-    '''Compose the HTML file from the template and the input HTML'''
+    ''' Substitute the content into the template'''
     page = template[:]
-
-    # Convert page content from MD to HTML and add it to the template
     if not "{{.content}}" in page:
         abort("No {{.content}} tag found. Aborting.")
-    page = page.replace("{{.content}}", content)
+    else:
+        page = page.replace("{{.content}}", content)
 
     return page
 
 
 def construct_destination_filename(filename: str, path_output: str) -> str:
     basename = os.path.basename(filename)
-    basename_wout_ext = os.path.splitext(basename)[0]
     if path_output[-1] == "/":
         path_output = path_output[:-1]
-    destination = path_output + "/" + basename_wout_ext + ".html"
+    destination = path_output + "/" + basename
     return destination
 
 
@@ -114,10 +106,10 @@ def load_config(config_file: str) -> Tuple[str, str, str, bool]:
 def process_input_files(path_rawfiles: str, template: str,
                         path_output: str) -> None:
     for filename in glob.iglob(path_rawfiles + "/*.html"):
-        # Read current HTML file
+        # Read current input file
         content = read_file(filename)
 
-        # Generate HTML from MD file
+        # Generate the HTML
         page = generate_site(template, content)
 
         # Write HTML file to HDD
