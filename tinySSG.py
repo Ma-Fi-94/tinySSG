@@ -54,8 +54,16 @@ if __name__ == "__main__":  # pragma: no cover
     if len(sys.argv) != 3:
         print("\nSyntax:\ntinySSG.py inputfile outputfile\n")
         raise SystemExit
+    else:
+        inputfile = sys.argv[1]
+        outputfile = sys.argv[2]
     
-    raw = read_file(sys.argv[1])
+    # Read input
+    raw = read_file(inputfile)
+
+    # Add all includes
     processed = add_includes(raw)
     
-    # TODO: write processed to new file
+    # Write to destination
+    write_file(outputfile, processed)
+    
