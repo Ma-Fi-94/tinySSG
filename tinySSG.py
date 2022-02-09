@@ -51,8 +51,8 @@ def add_includes(raw: str) -> str:
     return ret
 
 if __name__ == "__main__":  # pragma: no cover
-    if len(sys.argv) != 2:
-        print("\nSyntax:\ntinySSG.py inputfile.html\n")
+    if len(sys.argv) != 3:
+        print("\nSyntax:\ntinySSG.py inputfile outputfile\n")
         raise SystemExit
     
     raw = read_file(sys.argv[1])
