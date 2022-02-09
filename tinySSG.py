@@ -1,59 +1,48 @@
-import re
-import sys
+import re, sys, pathlib
+
+def abort(message: str) -> None:
+    '''Abort program execution after printing error message to stderr'''
+    print(message, file=sys.stderr)
+    raise SystemExit
+
 
 def read_file(filepath: str) -> str:
     '''Generic file reading function'''
-    try:
-        with open(filepath, "r") as f:
-            filecontents = f.read()
-    except:
-        print("Error loading file >>>" + filepath + "<<<. Aborting.")
-        raise SystemExit
-    
+    filecontents = pathlib.Path(filepath).read_text()
+
     if len(filecontents) == 0:
-        print("File >>>" + filepath + "<<< has zero length. Aborting.")
-        raise SystemExit
+        abort("File >>>" + filepath + "<<< has zero length. Aborting.")
 
     return filecontents
 
 
 def write_file(destination: str, contents: str) -> None:
     '''Generic file writing function'''
-    try:
-        with open(destination, "w") as f:
-            f.write(contents)
-    except:
-        print("Error writing to file " + destination + ". Aborting.")
-        raise SystemExit
+    pathlib.Path(destination).write_text(contents)
+
 
 
 def add_includes(raw: str) -> str:
     # Local copy to operate on
     ret = str(raw)
     
-    # Get all occurences of the #include pattern
-    include_pattern = r"^#include .+$"
-    all_includes = re.findall(include_pattern, raw, re.MULTILINE)
-    
-    # Iterate through them
-    for include in all_includes:
-        # Extract filename from pattern
-        filename = include.split("#include ")[1]
-        
-        # Try to load the file
-        # FIXME: Reading from file adds a newline at the end by default
-        # FIXME: We might want to fix this, but it's not a major problem ATM.
-        included_content = read_file(filename)
-        
-        # Include it into the return string
-        ret = ret.replace(include, included_content)
-        
+    # The pattern indicating a file include
+    # We need to use parentheses to denote the matched group nb. 1
+    include_pattern = r"^#include (.+)$"
+
+    # Substitute all occurences at once with re.sub() and a substitution function
+    f = lambda include_name: read_file(include_name.group(1))
+    ret = re.sub(include_pattern, f, ret, flags=re.MULTILINE)
+
+    # FIXME: Reading from file adds a newline at the end by default
+    # FIXME: We might want to fix this, but it's not a major problem ATM.
+
     return ret
+
 
 if __name__ == "__main__":  # pragma: no cover
     if len(sys.argv) != 3:
-        print("\nSyntax:\ntinySSG.py inputfile outputfile\n")
-        raise SystemExit
+        abort("\nSyntax:\ntinySSG.py inputfile outputfile\n")
     else:
         inputfile = sys.argv[1]
         outputfile = sys.argv[2]
