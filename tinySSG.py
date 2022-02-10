@@ -41,18 +41,32 @@ def add_includes(raw: str) -> str:
 
 
 if __name__ == "__main__":  # pragma: no cover
-    if len(sys.argv) != 3:
-        abort("\nSyntax:\ntinySSG.py inputfile outputfile\n")
-    else:
-        inputfile = sys.argv[1]
-        outputfile = sys.argv[2]
+    # python3 tinySSG.py --file inputfile outputfile
+    # python3 tinySSG.py --folger path/to/folder inputextension outputextension
     
-    # Read input
-    raw = read_file(inputfile)
+    
+    if len(sys.argv) == 4 and sys.argv[1] == "--file":
+        # Single-file mode
+        inputfile = sys.argv[2]
+        outputfile = sys.argv[3]
 
-    # Add all includes
-    processed = add_includes(raw)
+        # Load and process input file; write to HDD.
+        raw = read_file(inputfile)
+        processed = add_includes(raw)
+        write_file(outputfile, processed)
+
+    elif len(sys.argv) == 5 and sys.argv[1] == "--folder":
+        # Whole-folder mode
+        inputfolder = sys.argv[2]
+        inputfile_extension = sys.argv[3]
+        outputfile_extension = sys.argv[4]
+        
+        abort("Whole-folder mode is not implemented yet.")
+
+    else:
+        syntax = "\nSyntax:\n" + \
+        "tinySSG.py --file inputfile outputfile\n" + \
+        "tinySSG.py --folder path/to/folder inputextension outputextension\n"
+        abort(syntax)
     
-    # Write to destination
-    write_file(outputfile, processed)
     
