@@ -1,4 +1,4 @@
-import re, sys, pathlib
+import glob, re, sys, pathlib
 
 def abort(message: str) -> None:
     '''Abort program execution after printing error message to stderr'''
@@ -40,29 +40,48 @@ def add_includes(raw: str) -> str:
     return ret
 
 
+def get_input_filenames(inputfolder: str, inputfile_extension: str) -> [str]:
+    return list(glob.iglob(inputfolder + "/*." + inputfile_extension))
+
+
+
 if __name__ == "__main__":  # pragma: no cover
     # python3 tinySSG.py --file inputfile outputfile
     # python3 tinySSG.py --folger path/to/folder inputextension outputextension
     
-    
     if len(sys.argv) == 4 and sys.argv[1] == "--file":
-        # Single-file mode
-        inputfile = sys.argv[2]
-        outputfile = sys.argv[3]
+        # Setting up single-file mode
+        input_filename = sys.argv[2]
+        output_filename = sys.argv[3]
 
         # Load and process input file; write to HDD.
-        raw = read_file(inputfile)
+        print(input_filename, " --> ", output_filename)
+        raw = read_file(input_filename)
         processed = add_includes(raw)
-        write_file(outputfile, processed)
+        write_file(output_filename, processed)
 
     elif len(sys.argv) == 5 and sys.argv[1] == "--folder":
-        # Whole-folder mode
+        # Setting up whole-folder mode
         inputfolder = sys.argv[2]
         inputfile_extension = sys.argv[3]
         outputfile_extension = sys.argv[4]
+        if inputfile_extension == outputfile_extension:
+            abort("Input file extension must be different from output file extension.")
         
-        abort("Whole-folder mode is not implemented yet.")
-
+        # Get all files from inputfolder which have the inputfile_extension
+        input_filenames = get_input_filenames(inputfolder, inputfile_extension)
+    
+        # Generate the corresponding outputfile names
+        # by changing the extension to outputfile_extension
+        output_filenames = [s[:-len(inputfile_extension)]+outputfile_extension for s in input_filenames]
+    
+        # Process them one after another and write them HDD
+        for input_filename, output_filename in zip(input_filenames, output_filenames):
+            print(input_filename, " --> ", output_filename)
+            raw = read_file(input_filename)
+            processed = add_includes(raw)
+            write_file(output_filename, processed)
+            
     else:
         syntax = "\nSyntax:\n" + \
         "tinySSG.py --file inputfile outputfile\n" + \
