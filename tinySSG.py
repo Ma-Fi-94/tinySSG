@@ -75,10 +75,9 @@ if __name__ == "__main__":  # pragma: no cover
         input_filenames = get_input_filenames(inputfolder, inputfile_extension)
     
         # Generate the corresponding outputfile names
-        # by changing the extension to outputfile_extension
         output_filenames = replace_extensions(input_filenames, inputfile_extension, outputfile_extension)
     
-        # Process them one after another and write them HDD
+        # Process them one after another and write them to HDD
         for input_filename, output_filename in zip(input_filenames, output_filenames):
             print(input_filename, " --> ", output_filename)
             raw = read_file(input_filename)
