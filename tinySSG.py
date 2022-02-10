@@ -44,6 +44,9 @@ def get_input_filenames(inputfolder: str, inputfile_extension: str) -> [str]:
     return list(glob.iglob(inputfolder + "/*." + inputfile_extension))
 
 
+def replace_extensions(filenames: [str], old_extension: str, new_extension: str) -> [str]:
+    return [s[:-len(old_extension)]+new_extension for s in filenames]
+
 
 if __name__ == "__main__":  # pragma: no cover
     # python3 tinySSG.py --file inputfile outputfile
@@ -73,7 +76,7 @@ if __name__ == "__main__":  # pragma: no cover
     
         # Generate the corresponding outputfile names
         # by changing the extension to outputfile_extension
-        output_filenames = [s[:-len(inputfile_extension)]+outputfile_extension for s in input_filenames]
+        output_filenames = replace_extensions(input_filenames, inputfile_extension, outputfile_extension)
     
         # Process them one after another and write them HDD
         for input_filename, output_filename in zip(input_filenames, output_filenames):
