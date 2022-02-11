@@ -68,8 +68,15 @@ if __name__ == "__main__":  # pragma: no cover
         inputfolder = sys.argv[2]
         inputfile_extension = sys.argv[3]
         outputfile_extension = sys.argv[4]
+        
+        # Some sanitising
         if inputfile_extension == outputfile_extension:
             abort("Input file extension must be different from output file extension.")
+        if inputfile_extension[0] == ".":
+            inputfile_extension = inputfile_extension[1:]
+        if outputfile_extension[0] == ".":
+            outputfile_extension = outputfile_extension[1:]
+        
         
         # Get all files from inputfolder which have the inputfile_extension
         input_filenames = get_input_filenames(inputfolder, inputfile_extension)
