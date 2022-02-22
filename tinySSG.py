@@ -41,19 +41,20 @@ def add_includes(raw: str) -> str:
 
 
 def get_input_filenames(inputfolder: str, inputfile_extension: str) -> [str]:
+    '''Return a list of file names which have the inputfile_extension'''
     return list(glob.iglob(inputfolder + "/*." + inputfile_extension))
 
 
 def replace_extensions(filenames: [str], old_extension: str, new_extension: str) -> [str]:
+    '''Replace the extension of a filename'''
     return [s[:-len(old_extension)]+new_extension for s in filenames]
 
 
 if __name__ == "__main__":  # pragma: no cover
-    # python3 tinySSG.py --file inputfile outputfile
-    # python3 tinySSG.py --folger path/to/folder inputextension outputextension
-    
+        
+    # Single-file mode
     if len(sys.argv) == 4 and sys.argv[1] == "--file":
-        # Setting up single-file mode
+        # Setup
         input_filename = sys.argv[2]
         output_filename = sys.argv[3]
 
@@ -63,8 +64,9 @@ if __name__ == "__main__":  # pragma: no cover
         processed = add_includes(raw)
         write_file(output_filename, processed)
 
+    # Whole-folder mode
     elif len(sys.argv) == 5 and sys.argv[1] == "--folder":
-        # Setting up whole-folder mode
+        # Setup
         inputfolder = sys.argv[2]
         inputfile_extension = sys.argv[3]
         outputfile_extension = sys.argv[4]
