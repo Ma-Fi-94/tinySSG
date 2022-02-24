@@ -39,6 +39,11 @@ def add_includes(raw: str) -> str:
 
     return ret
 
+def replace_defines(raw: str) -> str:
+    # TODO
+    
+    return raw
+
 
 def get_input_filenames(inputfolder: str, inputfile_extension: str) -> [str]:
     '''Return a list of file names which have the inputfile_extension'''
@@ -61,7 +66,7 @@ if __name__ == "__main__":  # pragma: no cover
         # Load and process input file; write to HDD.
         print(input_filename, " --> ", output_filename)
         raw = read_file(input_filename)
-        processed = add_includes(raw)
+        processed = replace_defines(add_includes(raw))
         write_file(output_filename, processed)
 
     # Whole-folder mode
@@ -90,7 +95,7 @@ if __name__ == "__main__":  # pragma: no cover
         for input_filename, output_filename in zip(input_filenames, output_filenames):
             print(input_filename, " --> ", output_filename)
             raw = read_file(input_filename)
-            processed = add_includes(raw)
+            processed = replaces_defines(add_includes(raw))
             write_file(output_filename, processed)
             
     else:
