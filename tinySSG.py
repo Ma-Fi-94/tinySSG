@@ -31,18 +31,38 @@ def add_includes(raw: str) -> str:
     include_pattern = r"^#include (.+)$"
 
     # Substitute all occurences at once with re.sub() and a substitution function
-    f = lambda include_name: read_file(include_name.group(1))
-    ret = re.sub(include_pattern, f, ret, flags=re.MULTILINE)
-
     # FIXME: Reading from file adds a newline at the end by default
     # FIXME: We might want to fix this, but it's not a major problem ATM.
+    f = lambda include_name: read_file(include_name.group(1))
+    ret = re.sub(include_pattern, f, ret, flags=re.MULTILINE)
 
     return ret
 
 def replace_defines(raw: str) -> str:
-    # TODO
+    # Local copy to operate on
+    ret = str(raw)
     
-    return raw
+    # The pattern indicating a definition of a variable
+    # We use parentheses to denote the two matched groups
+    define_pattern = '^#define (.+) (".+")$'
+    
+    # Find all replacements (variable -> contents)
+    replacements = re.findall(define_pattern, ret, flags=re.MULTILINE)
+    
+    # Now we can delete all lines with #define statements from the input
+    # FIXME: Currently, this leaves newlines
+    # FIXME: We might want to fix it, but it's not urgent.
+    ret = re.sub(define_pattern, '', ret, flags=re.MULTILINE)
+    
+    # And now, we just perform the replacements and are done.  
+    # FIXME: We currently substitute *all* occurences of a variable
+    # FIXME: regardless of whether it occurs before or after its definition.
+    # FIXME: This is likely not expected behaviour, so this will be fixed soon.
+    for old, new in replacements:
+        new_stripped = new[1:-1] # strip of enclosing quotation marks
+        ret = re.sub(old, new_stripped, ret, flags=re.MULTILINE)
+    
+    return ret
 
 
 def get_input_filenames(inputfolder: str, inputfile_extension: str) -> [str]:
