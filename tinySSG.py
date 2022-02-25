@@ -44,7 +44,7 @@ def replace_defines(raw: str) -> str:
     
     # The pattern indicating a definition of a variable
     # We use parentheses to denote the two matched groups
-    define_pattern = '^#define (.+) (".+")$'
+    define_pattern = '^#globaldefine (.+) (".+")$'
     
     # Find all replacements (variable -> contents)
     replacements = re.findall(define_pattern, ret, flags=re.MULTILINE)
@@ -55,9 +55,6 @@ def replace_defines(raw: str) -> str:
     ret = re.sub(define_pattern, '', ret, flags=re.MULTILINE)
     
     # And now, we just perform the replacements and are done.  
-    # FIXME: We currently substitute *all* occurences of a variable
-    # FIXME: regardless of whether it occurs before or after its definition.
-    # FIXME: This is likely not expected behaviour, so this will be fixed soon.
     for old, new in replacements:
         new_stripped = new[1:-1] # strip of enclosing quotation marks
         ret = re.sub(old, new_stripped, ret, flags=re.MULTILINE)
