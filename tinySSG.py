@@ -21,7 +21,6 @@ def write_file(destination: str, contents: str) -> None:
     pathlib.Path(destination).write_text(contents)
 
 
-
 def add_includes(raw: str) -> str:
     # Local copy to operate on
     ret = str(raw)
@@ -37,6 +36,7 @@ def add_includes(raw: str) -> str:
     ret = re.sub(include_pattern, f, ret, flags=re.MULTILINE)
 
     return ret
+
 
 def replace_defines(raw: str) -> str:
     # Local copy to operate on
@@ -68,15 +68,16 @@ def process_file(input_filename: str, output_filename: str):
     raw = read_file(input_filename)
     processed = replace_defines(add_includes(raw))
     write_file(output_filename, processed)
+
     
 def get_filenames_by_extension(folder: str, extension: str) -> [str]:
     '''Return a list of file names in specified folder which have the desired extension'''
     return list(glob.iglob(folder + "/*." + extension))
 
 
-def replace_extensions(filenames: [str], old_extension: str, new_extension: str) -> [str]:
+def replace_extension(filename: str, old_extension: str, new_extension: str) -> str:
     '''Replace the extension of a filename'''
-    return [s[:-len(old_extension)]+new_extension for s in filenames]
+    return filename[:-len(old_extension)]+new_extension
 
 
 if __name__ == "__main__":  # pragma: no cover
@@ -104,11 +105,10 @@ if __name__ == "__main__":  # pragma: no cover
         
         # Get all files from inputfolder which have the inputfile_extension
         input_filenames = get_filenames_by_extension(inputfolder, inputfile_extension)
-    
-        # Generate the corresponding outputfile names
-        output_filenames = replace_extensions(input_filenames, inputfile_extension, outputfile_extension)
-    
-        for input_filename, output_filename in zip(input_filenames, output_filenames):
+        
+        # And process them
+        for input_filename in input_filenames:
+            output_filename = replace_extension(input_filename, inputfile_extension, outputfile_extension)
             process_file(input_filename, output_filename)
             
     else:
