@@ -69,9 +69,9 @@ def process_file(input_filename: str, output_filename: str):
     processed = replace_defines(add_includes(raw))
     write_file(output_filename, processed)
     
-def get_input_filenames(inputfolder: str, inputfile_extension: str) -> [str]:
-    '''Return a list of file names which have the inputfile_extension'''
-    return list(glob.iglob(inputfolder + "/*." + inputfile_extension))
+def get_filenames_by_extension(folder: str, extension: str) -> [str]:
+    '''Return a list of file names in specified folder which have the desired extension'''
+    return list(glob.iglob(folder + "/*." + extension))
 
 
 def replace_extensions(filenames: [str], old_extension: str, new_extension: str) -> [str]:
@@ -103,7 +103,7 @@ if __name__ == "__main__":  # pragma: no cover
             outputfile_extension = outputfile_extension[1:]
         
         # Get all files from inputfolder which have the inputfile_extension
-        input_filenames = get_input_filenames(inputfolder, inputfile_extension)
+        input_filenames = get_filenames_by_extension(inputfolder, inputfile_extension)
     
         # Generate the corresponding outputfile names
         output_filenames = replace_extensions(input_filenames, inputfile_extension, outputfile_extension)
