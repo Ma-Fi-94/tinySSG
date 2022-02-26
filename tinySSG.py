@@ -62,6 +62,13 @@ def replace_defines(raw: str) -> str:
     return ret
 
 
+def process_file(input_filename: str, output_filename: str):
+    '''Read and process inputfile, write to outputfile'''
+    print(input_filename, " --> ", output_filename)
+    raw = read_file(input_filename)
+    processed = replace_defines(add_includes(raw))
+    write_file(output_filename, processed)
+    
 def get_input_filenames(inputfolder: str, inputfile_extension: str) -> [str]:
     '''Return a list of file names which have the inputfile_extension'''
     return list(glob.iglob(inputfolder + "/*." + inputfile_extension))
@@ -76,15 +83,9 @@ if __name__ == "__main__":  # pragma: no cover
         
     # Single-file mode
     if len(sys.argv) == 4 and sys.argv[1] == "--file":
-        # Setup
         input_filename = sys.argv[2]
         output_filename = sys.argv[3]
-
-        # Load and process input file; write to HDD.
-        print(input_filename, " --> ", output_filename)
-        raw = read_file(input_filename)
-        processed = replace_defines(add_includes(raw))
-        write_file(output_filename, processed)
+        process_file(input_filename, output_filename)
 
     # Whole-folder mode
     elif len(sys.argv) == 5 and sys.argv[1] == "--folder":
@@ -101,19 +102,14 @@ if __name__ == "__main__":  # pragma: no cover
         if outputfile_extension[0] == ".":
             outputfile_extension = outputfile_extension[1:]
         
-        
         # Get all files from inputfolder which have the inputfile_extension
         input_filenames = get_input_filenames(inputfolder, inputfile_extension)
     
         # Generate the corresponding outputfile names
         output_filenames = replace_extensions(input_filenames, inputfile_extension, outputfile_extension)
     
-        # Process them one after another and write them to HDD
         for input_filename, output_filename in zip(input_filenames, output_filenames):
-            print(input_filename, " --> ", output_filename)
-            raw = read_file(input_filename)
-            processed = replaces_defines(add_includes(raw))
-            write_file(output_filename, processed)
+            process_file(input_filename, output_filename)
             
     else:
         syntax = "\nSyntax:\n" + \
