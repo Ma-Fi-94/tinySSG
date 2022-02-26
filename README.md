@@ -13,7 +13,7 @@ Currently, two features are implemented:
     ```
 
 # Usage
-Two modes of operation are possible:
+Three modes of operation are possible:
   - Singe-file mode: 
   ```
   tinySSG.py --file inputfile outputfile
@@ -22,5 +22,11 @@ Two modes of operation are possible:
   - Whole-folder mode:
   ```
   tinySSG.py --folder path/to/folder inputextension outputextension
+  ```
+  
+  - Recursive mode (NOT IMPLEMENTED YET, WILL FOLLOW SOON):
+  ```
+  tinySSG.py --recursive path/to/folder inputextension outputextension
+  ```
   
 
