@@ -78,9 +78,30 @@ def process_file(inputfolder: Optional[str], input_filename: str,
     print("done.")
 
 
-def get_filenames_by_extension(folder: str, extension: str) -> List[str]:
+def process_folder(inputfolder: str, inputfile_extension: str,
+                   outputfile_extension: str):
+    # Get all files from inputfolder which have the inputfile_extension
+    input_filenames = get_filenames_by_extension(inputfolder,
+                                                 inputfile_extension,
+                                                 recursive=False)
+
+    # And process them
+    for input_filename in input_filenames:
+        output_filename = replace_extension(input_filename,
+                                            inputfile_extension,
+                                            outputfile_extension)
+        process_file(inputfolder=inputfolder,
+                     input_filename=input_filename,
+                     output_filename=output_filename)
+
+
+def get_filenames_by_extension(folder: str, extension: str,
+                               recursive: bool) -> List[str]:
     '''Return a list of file names in specified folder which have the desired extension'''
-    return glob.glob(folder + "/*." + extension)
+    if recursive:
+        return glob.glob(folder + "/**/*." + extension, recursive=True)
+    else:
+        return glob.glob(folder + "/*." + extension)
 
 
 def replace_extension(filename: str, old_extension: str,
@@ -116,43 +137,8 @@ if __name__ == "__main__":  # pragma: no cover
         if outputfile_extension[0] == ".":
             outputfile_extension = outputfile_extension[1:]
 
-        # Get all files from inputfolder which have the inputfile_extension
-        input_filenames = get_filenames_by_extension(inputfolder,
-                                                     inputfile_extension)
-
-        # And process them
-        for input_filename in input_filenames:
-            output_filename = replace_extension(input_filename,
-                                                inputfile_extension,
-                                                outputfile_extension)
-            process_file(inputfolder=inputfolder,
-                         input_filename=input_filename,
-                         output_filename=output_filename)
-
-# Recursive mode
-    elif len(sys.argv) == 5 and sys.argv[1] == "--recursive":
-        # Setup
-        inputfolder = sys.argv[2]
-        inputfile_extension = sys.argv[3]
-        outputfile_extension = sys.argv[4]
-
-        # Some sanitising
-        if inputfile_extension == outputfile_extension:
-            abort(
-                "Input file extension must be different from output file extension."
-            )
-        if inputfile_extension[0] == ".":
-            inputfile_extension = inputfile_extension[1:]
-        if outputfile_extension[0] == ".":
-            outputfile_extension = outputfile_extension[1:]
-
-        # Get all input files in the folder, as well as all of its subfolders
-        # TODO
-
-        # And process them
-        # TODO
-
-        raise NotImplementedError
+        # Process the folder
+        process_folder(inputfolder, inputfile_extension, outputfile_extension)
 
     else:
         syntax = "\nSyntax:\n" + \
