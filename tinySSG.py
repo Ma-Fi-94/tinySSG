@@ -1,5 +1,5 @@
 import glob, re, sys, pathlib
-from typing import List
+from typing import List, Optional
 
 
 def abort(message: str) -> None:
@@ -23,7 +23,7 @@ def write_file(destination: str, contents: str) -> None:
     pathlib.Path(destination).write_text(contents)
 
 
-def add_includes(raw: str) -> str:
+def add_includes(raw: str, path: Optional[str]) -> str:
     # Local copy to operate on
     ret = str(raw)
 
@@ -34,7 +34,10 @@ def add_includes(raw: str) -> str:
     # Substitute all occurences at once with re.sub() and a substitution function
     # FIXME: Reading from file adds a newline at the end by default
     # FIXME: We might want to fix this, but it's not a major problem ATM.
-    f = lambda include_name: read_file(include_name.group(1))
+    if path is not None:
+        f = lambda match_obj: read_file(path + "/" + match_obj.group(1))
+    else:
+        f = lambda match_obj: read_file(match_obj.group(1))
     ret = re.sub(include_pattern, f, ret, flags=re.MULTILINE)
 
     return ret
@@ -64,17 +67,20 @@ def replace_defines(raw: str) -> str:
     return ret
 
 
-def process_file(input_filename: str, output_filename: str):
+def process_file(inputfolder: Optional[str], input_filename: str,
+                 output_filename: str):
     '''Read and process inputfile, write to outputfile'''
     print(input_filename, " --> ", output_filename)
     raw = read_file(input_filename)
-    processed = replace_defines(add_includes(raw))
+    raw_with_includes = add_includes(raw=raw, path=inputfolder)
+    processed = replace_defines(raw_with_includes)
     write_file(output_filename, processed)
+    print("done.")
 
 
 def get_filenames_by_extension(folder: str, extension: str) -> List[str]:
     '''Return a list of file names in specified folder which have the desired extension'''
-    return list(glob.iglob(folder + "/*." + extension))
+    return glob.glob(folder + "/*." + extension)
 
 
 def replace_extension(filename: str, old_extension: str,
@@ -89,9 +95,10 @@ if __name__ == "__main__":  # pragma: no cover
     if len(sys.argv) == 4 and sys.argv[1] == "--file":
         input_filename = sys.argv[2]
         output_filename = sys.argv[3]
-        process_file(input_filename, output_filename)
+        process_file(inputfolder=None,
+                     input_filename=input_filename,
+                     output_filename=output_filename)
 
-        
     # Whole-folder mode
     elif len(sys.argv) == 5 and sys.argv[1] == "--folder":
         # Setup
@@ -118,16 +125,17 @@ if __name__ == "__main__":  # pragma: no cover
             output_filename = replace_extension(input_filename,
                                                 inputfile_extension,
                                                 outputfile_extension)
-            process_file(input_filename, output_filename)
-   
-    
-    # Recursive mode
+            process_file(inputfolder=inputfolder,
+                         input_filename=input_filename,
+                         output_filename=output_filename)
+
+# Recursive mode
     elif len(sys.argv) == 5 and sys.argv[1] == "--recursive":
         # Setup
         inputfolder = sys.argv[2]
         inputfile_extension = sys.argv[3]
         outputfile_extension = sys.argv[4]
-        
+
         # Some sanitising
         if inputfile_extension == outputfile_extension:
             abort(
@@ -137,15 +145,15 @@ if __name__ == "__main__":  # pragma: no cover
             inputfile_extension = inputfile_extension[1:]
         if outputfile_extension[0] == ".":
             outputfile_extension = outputfile_extension[1:]
-            
+
         # Get all input files in the folder, as well as all of its subfolders
         # TODO
-        
+
         # And process them
         # TODO
-        
+
         raise NotImplementedError
-   
+
     else:
         syntax = "\nSyntax:\n" + \
         "tinySSG.py --file inputfile outputfile\n" + \
