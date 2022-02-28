@@ -91,6 +91,7 @@ if __name__ == "__main__":  # pragma: no cover
         output_filename = sys.argv[3]
         process_file(input_filename, output_filename)
 
+        
     # Whole-folder mode
     elif len(sys.argv) == 5 and sys.argv[1] == "--folder":
         # Setup
@@ -118,9 +119,36 @@ if __name__ == "__main__":  # pragma: no cover
                                                 inputfile_extension,
                                                 outputfile_extension)
             process_file(input_filename, output_filename)
-
+   
+    
+    # Recursive mode
+    elif len(sys.argv) == 5 and sys.argv[1] == "--recursive":
+        # Setup
+        inputfolder = sys.argv[2]
+        inputfile_extension = sys.argv[3]
+        outputfile_extension = sys.argv[4]
+        
+        # Some sanitising
+        if inputfile_extension == outputfile_extension:
+            abort(
+                "Input file extension must be different from output file extension."
+            )
+        if inputfile_extension[0] == ".":
+            inputfile_extension = inputfile_extension[1:]
+        if outputfile_extension[0] == ".":
+            outputfile_extension = outputfile_extension[1:]
+            
+        # Get all input files in the folder, as well as all of its subfolders
+        # TODO
+        
+        # And process them
+        # TODO
+        
+        raise NotImplementedError
+   
     else:
         syntax = "\nSyntax:\n" + \
         "tinySSG.py --file inputfile outputfile\n" + \
-        "tinySSG.py --folder path/to/folder inputextension outputextension\n"
+        "tinySSG.py --folder path/to/folder inputextension outputextension\n" + \
+        "tinySSG.py --recursive path/to/folder inputextension outputextension\n"
         abort(syntax)
