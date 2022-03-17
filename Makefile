@@ -2,7 +2,7 @@ all:
 	importchecker tinySSG.py
 	yapf -i tinySSG.py
 	mypy tinySSG.py
-	#py.test --cov-report term-missing --cov=. -v
+	py.test --verbose --cov=. --cov-report term-missing
 
 testfile:
 	python3 tinySSG.py --file someinputfile.prehtml someinputfile.html

@@ -49,14 +49,12 @@ def replace_defines(raw: str) -> str:
 
     # The pattern indicating a definition of a variable
     # We use parentheses to denote the two matched groups
-    define_pattern = '^#globaldefine (.+) (".+")$'
+    define_pattern = r'^#globaldefine (.+) (".+")\n'
 
     # Find all replacements (variable -> contents)
     replacements = re.findall(define_pattern, ret, flags=re.MULTILINE)
 
     # Now we can delete all lines with #define statements from the input
-    # FIXME: Currently, this leaves newlines
-    # FIXME: We might want to fix it, but it's not urgent.
     ret = re.sub(define_pattern, '', ret, flags=re.MULTILINE)
 
     # And now, we just perform the replacements and are done.
@@ -143,6 +141,5 @@ if __name__ == "__main__":  # pragma: no cover
     else:
         syntax = "\nSyntax:\n" + \
         "tinySSG.py --file inputfile outputfile\n" + \
-        "tinySSG.py --folder path/to/folder inputextension outputextension\n" + \
-        "tinySSG.py --recursive path/to/folder inputextension outputextension\n"
+        "tinySSG.py --folder path/to/folder inputextension outputextension\n"
         abort(syntax)
